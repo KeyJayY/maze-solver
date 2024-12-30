@@ -3,30 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maze Visualizer</title>
+    <title>Wizualizacja Labirynt</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="algorithms.js" async></script>
     <script src="script.js" async></script>
 </head>
 <body>
-    <header>
-        <h1>Maze Visualizer</h1>
+    <div class="window-container" id="info-window">
+        <div class="window">
+            <div class="tabs">
+                <div class="tab active" onclick="changeTab(this, 'instruction')">Instrukcja</div>
+                <div class="tab" onclick="changeTab(this, 'description')">Opis Algorytmów</div>
+            </div>
+            <div class="content active" id="instruction">
+                <h2>Instrukcja</h2>
+                <p>To jest instrukcja korzystania z aplikacji.</p>
+            </div>
+            <div class="content" id="description">
+                <h2>Opis Algorytmów</h2>
+                <p>To jest opis algorytmów użytych w aplikacji.</p>
+            </div>
+        </div>
+    </div>
+    <div class="window-container" id="results-window" >
+        <div class="window">
+            <h2>Rozwiązano Labirynt</h2>
+            <p>Wynik działania algorytmu.</p>
+            <button>Pokaż ścieżkę</button>
+        </div>
+    </div>
+        <header>
+            <h1>Wizualizacja Labirynt</h1>
         <div class="auth-buttons">
+            <button id="info" onclick="showInfoWindow()">?</button>
             <button id="login">Login</button>
             <button id="register">Register</button>
         </div>
     </header>
     <main>
         <div class="controls">
-            <button id="createMaze">Create Maze</button>
-            <button id="solveMaze">Solve Maze</button>
-            <div class="SizeSelector">
-                <label for="mazeSize">Maze Size:</label>
-                <input type="number" id="mazeSize" name="mazeSize" min="5" max="100" value="20">
+            <div class="maze-options">
+                <select name="generatingAlgorithm" id="generatingAlgorithm">
+                    <option value="0">algorytm DFS</option>
+                    <option value="1">algorytm Kruskala</option>
+                    <option value="2">algorytm Prima</option>
+                    <option value="3">algorytm Binary Tree</option>
+                    <option value="4">algorytm Growing Tree</option>
+                </select>
+                <select name="solvingAlgorithm" id="solvingAlgorithm">
+                    <option value="0">algorytm BFS</option>
+                    <option value="1">algorytm DFS</option>
+                    <option value="2">algorytm A*</option>
+                </select>
+                <div class="SizeSelector">
+                    <label for="mazeSize">Maze Size:</label>
+                    <input type="number" id="mazeSize" name="mazeSize" min="10" max="100" value="30">
+                </div>
+                początek: <div id="startButton"></div>
+                koniec: <div id="endButton"></div>
             </div>
-            początek: <div id="startButton"></div>
-            koniec: <div id="endButton"></div>
+            <div class="maze-buttons">
+                <button id="createMaze">Wygeneruj Labirynt</button>
+                <button id="solveMaze">Rozwiąż Labirynt</button>
+                <button id="save">Zapisz obecny układ labiryntu</button>
+                <button id="load">wczytaj układ labiryntu</button>
+            </div>
         </div>
-        <canvas id="myCanvas" width="800" height="800" style="border:1px solid #000000; background-color: #000000;"></canvas>
+        <canvas id="myCanvas" width="700" height="700" style="border:1px solid #000000; background-color: #000000;"></canvas>
     </main>
     <footer>
         <p>2024 Krzysztof Jabłoński Techniki Internetowe - Wizualizacja algorytmów tworzących i rozwiązujących labirynty. </p>

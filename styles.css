@@ -1,110 +1,174 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f9;
-    color: #333;
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	background-color: #f4f4f9;
+	color: #333;
 }
 
 header {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+	background-color: #4caf50;
+	color: white;
+	padding: 10px 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
 header h1 {
-    margin: 0;
+	margin: 0;
 }
 
 .auth-buttons button {
-    background-color: white;
-    color: #4CAF50;
-    border: none;
-    padding: 8px 12px;
-    margin-left: 10px;
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 14px;
+	background-color: white;
+	color: #4caf50;
+	border: none;
+	padding: 8px 12px;
+	margin-left: 10px;
+	cursor: pointer;
+	border-radius: 4px;
+	font-size: 14px;
 }
 
 .auth-buttons button:hover {
-    background-color: #45a049;
-    color: white;
+	background-color: #45a049;
+	color: white;
 }
 
 main {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 }
 
 .controls {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-bottom: 20px;
+	width: 100%;
 }
 
 .controls button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    margin-right: 10px;
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 16px;
+	background-color: #4caf50;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	margin-right: 10px;
+    margin-bottom: 10px;
+	cursor: pointer;
+	border-radius: 4px;
+	font-size: 16px;
 }
 
 .controls button:hover {
-    background-color: #45a049;
+	background-color: #45a049;
+}
+
+.maze-options {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 20px;
 }
 
 .size-selector {
-    display: flex;
-    align-items: center;
+	display: flex;
+	align-items: center;
 }
 
 .size-selector label {
-    margin-right: 10px;
+	margin-right: 10px;
 }
 
 .size-selector select {
-    padding: 5px;
-    font-size: 16px;
+	padding: 5px;
+	font-size: 16px;
 }
 
 canvas {
-    border: 1px solid #ddd;
-    background-color: white;
+	border: 1px solid #ddd;
+	background-color: white;
 }
 
 footer {
-    background-color: #4CAF50;
-    color: white;
-    text-align: center;
-    padding: 10px 0;
-    bottom: 0;
-    width: 100%;
+	background-color: #4caf50;
+	color: white;
+	text-align: center;
+	padding: 10px 0;
+	bottom: 0;
+	width: 100%;
 }
 
-#startButton, #endButton {
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
+#startButton,
+#endButton {
+	width: 30px;
+	height: 30px;
+	cursor: pointer;
 }
 
-#startButton{
-    background-color: red;
+#startButton {
+	background-color: red;
 }
 
-#endButton{
-    background-color: blue;
+#endButton {
+	background-color: blue;
 }
 
-.clicked{
-    border: 4px solid black;
+.clicked {
+	border: 4px solid black;
+}
+
+.window-container {
+	display: none;
+	justify-content: center;
+	align-items: center;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 10;
+}
+
+.window {
+	width: 400px;
+	background: white;
+	border-radius: 10px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	overflow: hidden;
+}
+
+.tabs {
+	display: flex;
+	background-color: #0078d7;
+}
+
+.tab {
+	flex: 1;
+	padding: 10px;
+	text-align: center;
+	color: white;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+.tab:hover {
+	background-color: #005bb5;
+}
+
+.tab.active {
+	background-color: #005bb5;
+}
+
+.content {
+	padding: 20px;
+	display: none;
+}
+
+.content.active {
+	display: block;
 }

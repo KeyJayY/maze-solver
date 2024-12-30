@@ -1,32 +1,27 @@
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 
-const Field = {
-  EMPTY: 0,
-	WALL: 1,
-	START: 2,
-	END: 3,
-	VISITED: 4,
-	CURRENT: 5,
-	INQUEUE: 6,
-	PATH: 7,
-};
-
 let selectedStart = false;
 let selectedEnd = false;
-let size = 40;
+let size = 30;
 let tile_height = canvas.height / size;
 let tile_width = canvas.width / size;
-let maze = Array.from({ length: size }, () => Array(size).fill(Field.WALL));
+let maze = Array.from({ length: size }, () => Array(size).fill(Field.EMPTY));
+let activeDrawing = false;
+
+const generatingAlgorithms = [generateMazeDFS, generateMazeKruskal, generateMazePrim, generateMazeBinaryTree, generateMazeGrowingTree];
+const solvingAlgorithms = [solveMazeBFS, solveMazeDFS, solveMazeAStar];
 
 document.querySelector("#startButton").addEventListener("click", (e) => {
+	if(activeDrawing) return;
 	document.querySelector("#endButton").classList.remove("clicked");
 	e.target.classList.add("clicked");
-  selectedStart = true;
-  selectedEnd = false;
+  	selectedStart = true;
+ 	selectedEnd = false;
 });
 
 document.querySelector("#endButton").addEventListener("click", (e) => {
+	if(activeDrawing) return;
 	document.querySelector("#startButton").classList.remove("clicked");
 	e.target.classList.add("clicked");
 	selectedStart = false;
@@ -34,21 +29,67 @@ document.querySelector("#endButton").addEventListener("click", (e) => {
 });
 
 document.getElementById("mazeSize").addEventListener("change", () => {
+	if(activeDrawing) return;
 	size = parseInt(document.getElementById("mazeSize").value);
+	if (size > 100) size = 100;
+	if (size < 10) size = 10;
 	document.getElementById("mazeSize").value = size;
-	maze = Array.from({ length: size }, () => Array(size).fill(Field.WALL));
+	maze = Array.from({ length: size }, () => Array(size).fill(Field.EMPTY));
 	tile_height = canvas.height / size;
 	tile_width = canvas.width / size;
 	draw(maze);
 });
 
-document.getElementById("createMaze").addEventListener("click", () => {
-	generateMaze(size);
+document.getElementById("createMaze").addEventListener("click", async () => {
+	if(activeDrawing) return;
+	const algorithmNumber = parseInt(document.querySelector("#generatingAlgorithm").value)
+	activeDrawing = true;
+	maze = await generatingAlgorithms[algorithmNumber](size, true);
+	activeDrawing = false;
+	draw(maze);
 });
 
 document.getElementById("solveMaze").addEventListener("click", async () => {
-	drawPath(await solveMaze(size, maze, draw));
+	if(activeDrawing) return;
+	clearPath(maze);
+	const algorithmNumber = parseInt(document.querySelector("#solvingAlgorithm").value)
+	activeDrawing = true;
+	const result1 = await solvingAlgorithms[algorithmNumber](size, maze, draw, true);
+	console.log(result1.steps);
+	// showResultWindow(`${result1.steps} steps for BFS, ${result2.steps} steps for DFS, ${result3.steps} steps for A*`);
+	drawPath(result1.path);
+	activeDrawing = false;
 });
+
+document.querySelector("#info-window").addEventListener("click", (e) => {
+	if (e.target === e.currentTarget) {
+		document.querySelector("#info-window").style.display = "none";
+	}
+});
+
+document.querySelector("#results-window").addEventListener("click", (e) => {
+	if (e.target === e.currentTarget) {
+		document.querySelector("#results-window").style.display = "none";
+	}
+});
+
+function showResultWindow(text) {
+	const window = document.querySelector("#results-window")
+	window.querySelector("p").innerText = text;
+	window.style.display = "flex";
+}
+
+function changeTab(object, tab) {
+	document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+	object.classList.add("active");
+	document.querySelectorAll(".content").forEach((t) => t.classList.remove("active"));
+	document.querySelector(`#${tab}`).classList.add("active");
+}
+
+function showInfoWindow() {
+	const window = document.querySelector("#info-window");
+	window.style.display = "flex";
+}
 
 function clearButtons() {
   document.querySelector("#startButton").classList.remove("clicked");
@@ -74,6 +115,48 @@ function drawPath(path) {
 	draw(maze);
 }
 
+function clearPath(){
+	for (let i = 0; i < size; i++) {
+		for (let j = 0; j < size; j++) {
+			if (maze[i][j] == Field.PATH) maze[i][j] = Field.EMPTY;
+		}
+	}
+}
+
+function readMazeData() {
+	const mazeData = {};
+	mazeData.size = size;
+	mazeData.walls = [];
+	mazeData.start = {};
+	mazeData.end = {};
+	for (let i = 0; i < size; i++) {
+		for (let j = 0; j < size; j++) {
+			if (maze[i][j] === Field.WALL) {
+				mazeData.walls.push({ x: i, y: j });
+			} else if (maze[i][j] === Field.START) {
+				mazeData.start = { x: i, y: j };
+			} else if (maze[i][j] === Field.END) {
+				mazeData.end = { x: i, y: j };
+			}
+		}
+	}
+	console.log(JSON.stringify(mazeData));
+	fetch('http://localhost/~2jablonski/labs/proj/data.php', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify(mazeData)
+	})
+	.then(response => response.json())
+	.then(data => {
+		console.log('Success:', data);
+	})
+	.catch((error) => {
+		console.error('Error:', error);
+	});
+}
+
 function draw(maze) {
 	for (let i = 0; i < size; i++) {
 		for (let j = 0; j < size; j++) {
@@ -92,253 +175,6 @@ function draw(maze) {
 			);
 		}
 	}
-}
-
-async function generateMaze(size) {
-	const tempMaze = Array.from({ length: size }, () =>
-		Array(size).fill(Field.WALL)
-	);
-
-	const startX = 0;
-	const startY = 0;
-
-	tempMaze[startY][startX] = Field.START;
-
-	function isInBounds(x, y) {
-		return x >= 0 && y >= 0 && x < size && y < size;
-	}
-	async function dfs(x, y) {
-		const directions = [
-			[0, -1],
-			[0, 1],
-			[-1, 0],
-			[1, 0],
-		];
-
-		for (let i = directions.length - 1; i > 0; i--) {
-			const j = Math.floor(Math.random() * (i + 1));
-			[directions[i], directions[j]] = [directions[j], directions[i]];
-		}
-
-		for (const [dx, dy] of directions) {
-			const nx = x + dx * 2;
-			const ny = y + dy * 2;
-
-			if (isInBounds(nx, ny) && tempMaze[ny][nx] === Field.WALL) {
-				tempMaze[y + dy][x + dx] = Field.EMPTY;
-				tempMaze[ny][nx] = Field.EMPTY;
-				draw(tempMaze);
-				await new Promise((resolve) => setTimeout(resolve, 1));
-				await dfs(nx, ny);
-			}
-		}
-	}
-
-	tempMaze[startY][startX] = Field.START;
-	draw(tempMaze);
-	await dfs(startX, startY);
-
-	maze = tempMaze;
-}
-
-async function solveMaze(size, maze, draw) {
-	const tempMaze = maze.map((row) => [...row]);
-
-	let start = null;
-	let end = null;
-
-	for (let i = 0; i < size; i++) {
-		for (let j = 0; j < size; j++) {
-			if (maze[i][j] === Field.START) start = { x: i, y: j };
-			if (maze[i][j] === Field.END) end = { x: i, y: j };
-		}
-	}
-
-	if (!start || !end) {
-		console.error("Brak punktu START lub END w labiryncie.");
-		return;
-	}
-
-	const directions = [
-		{ dx: -1, dy: 0 },
-		{ dx: 1, dy: 0 },
-		{ dx: 0, dy: -1 },
-		{ dx: 0, dy: 1 },
-	];
-
-	const queue = [{ x: start.x, y: start.y, path: [] }];
-
-	while (queue.length > 0) {
-		const current = queue.shift();
-		const { x, y, path } = current;
-
-		if (x === end.x && y === end.y) {
-			console.log("Labirynt rozwiązany!");
-			return path;
-		}
-
-		tempMaze[x][y] = Field.CURRENT;
-		draw(tempMaze);
-    	await new Promise((resolve) => setTimeout(resolve, 50));
-		tempMaze[x][y] = Field.VISITED;
-
-		for (const { dx, dy } of directions) {
-			const nx = x + dx;
-			const ny = y + dy;
-
-			if (
-				nx >= 0 &&
-				nx < size &&
-				ny >= 0 &&
-				ny < size &&
-				(tempMaze[nx][ny] === Field.EMPTY ||
-					tempMaze[nx][ny] === Field.END)
-			) {
-				tempMaze[nx][ny] = Field.INQUEUE;		
-				queue.push({ x: nx, y: ny, path: [...path, { x: nx, y: ny }] });
-			}
-		}
-	}
-
-	console.log("Labirynt nie ma rozwiązania.");
-}
-
-async function solveMazeDFS(size, maze, draw) {
-	const tempMaze = maze.map((row) => [...row]);
-
-	let start = null;
-	let end = null;
-
-	for (let i = 0; i < size; i++) {
-		for (let j = 0; j < size; j++) {
-			if (maze[i][j] === Field.START) start = { x: i, y: j };
-			if (maze[i][j] === Field.END) end = { x: i, y: j };
-		}
-	}
-
-	if (!start || !end) {
-		console.error("Brak punktu START lub END w labiryncie.");
-		return;
-	}
-
-	const directions = [
-		{ dx: -1, dy: 0 },
-		{ dx: 1, dy: 0 },
-		{ dx: 0, dy: -1 },
-		{ dx: 0, dy: 1 },
-	];
-
-	async function dfs(x, y, path) {
-		if (x === end.x && y === end.y) {
-			console.log("Labirynt rozwiązany!");
-			return path;
-		}
-
-		tempMaze[x][y] = Field.VISITED;
-		draw(tempMaze);
-		await new Promise((resolve) => setTimeout(resolve, 50));
-
-		for (const { dx, dy } of directions) {
-			const nx = x + dx;
-			const ny = y + dy;
-
-			if (
-				nx >= 0 &&
-				nx < size &&
-				ny >= 0 &&
-				ny < size &&
-				(tempMaze[nx][ny] === Field.EMPTY ||
-					tempMaze[nx][ny] === Field.END)
-			) {
-				const result = await dfs(nx, ny, [...path, { x: nx, y: ny }]);
-				if (result) return result;
-			}
-		}
-
-		return null;
-	}
-
-	return dfs(start.x, start.y, []);
-}
-
-async function solveMazeAStar(size, maze, draw) {
-	const tempMaze = maze.map((row) => [...row]);
-
-	let start = null;
-	let end = null;
-
-	for (let i = 0; i < size; i++) {
-		for (let j = 0; j < size; j++) {
-			if (maze[i][j] === Field.START) start = { x: i, y: j };
-			if (maze[i][j] === Field.END) end = { x: i, y: j };
-		}
-	}
-
-	if (!start || !end) {
-		console.error("Brak punktu START lub END w labiryncie.");
-		return;
-	}
-
-	const directions = [
-		{ dx: -1, dy: 0 },
-		{ dx: 1, dy: 0 },
-		{ dx: 0, dy: -1 },
-		{ dx: 0, dy: 1 },
-	];
-
-	function heuristic(x, y) {
-		return Math.abs(x - end.x) + Math.abs(y - end.y);
-	}
-
-	const openSet = [
-		{
-			x: start.x,
-			y: start.y,
-			cost: 0,
-			heuristic: heuristic(start.x, start.y),
-			path: [],
-		},
-	];
-
-	while (openSet.length > 0) {
-		openSet.sort((a, b) => a.cost + a.heuristic - (b.cost + b.heuristic));
-		const current = openSet.shift();
-		const { x, y, cost, path } = current;
-
-		if (x === end.x && y === end.y) {
-			console.log("Labirynt rozwiązany!");
-			return path;
-		}
-
-		tempMaze[x][y] = Field.VISITED;
-		draw(tempMaze);
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    console.log(openSet)
-
-		for (const { dx, dy } of directions) {
-			const nx = x + dx;
-			const ny = y + dy;
-
-			if (
-				nx >= 0 &&
-				nx < size &&
-				ny >= 0 &&
-				ny < size &&
-				(tempMaze[nx][ny] === Field.EMPTY ||
-					tempMaze[nx][ny] === Field.END)
-			) {
-				openSet.push({
-					x: nx,
-					y: ny,
-					cost: cost + 1,
-					heuristic: heuristic(nx, ny),
-					path: [...path, { x: nx, y: ny }],
-				});
-			}
-		}
-	}
-
-	console.log("Labirynt nie ma rozwiązania.");
 }
 
 canvas.addEventListener("click", function (event) {
