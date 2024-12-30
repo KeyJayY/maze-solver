@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maze Visualizer</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" async></script>
+</head>
+<body>
+    <header>
+        <h1>Maze Visualizer</h1>
+        <div class="auth-buttons">
+            <button id="login">Login</button>
+            <button id="register">Register</button>
+        </div>
+    </header>
+    <main>
+        <div class="controls">
+            <button id="createMaze">Create Maze</button>
+            <button id="solveMaze">Solve Maze</button>
+            <div class="SizeSelector">
+                <label for="mazeSize">Maze Size:</label>
+                <input type="number" id="mazeSize" name="mazeSize" min="5" max="100" value="20">
+            </div>
+            początek: <div id="startButton"></div>
+            koniec: <div id="endButton"></div>
+        </div>
+        <canvas id="myCanvas" width="800" height="800" style="border:1px solid #000000; background-color: #000000;"></canvas>
+    </main>
+    <footer>
+        <p>2024 Krzysztof Jabłoński Techniki Internetowe - Wizualizacja algorytmów tworzących i rozwiązujących labirynty. </p>
+    </footer>
+</body>
+</html>
