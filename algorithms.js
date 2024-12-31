@@ -14,6 +14,7 @@ function placeStartEnd(size, maze) {
 	startY = 0;
 	endX = size - 1;
 	endY = size - 1;
+	
 
 	maze[startY][startX] = Field.START;
 	maze[endY][endX] = Field.END;
@@ -290,7 +291,7 @@ async function generateMazeGrowingTree(size, visualisation = false) {
 
 async function solveMazeBFS(size, maze, draw, visualisation = false) {
 	const tempMaze = maze.map((row) => [...row]);
-
+	
 	let start = null;
 	let end = null;
 
@@ -333,17 +334,17 @@ async function solveMazeBFS(size, maze, draw, visualisation = false) {
 			const nx = x + dx;
 			const ny = y + dy;
 
-			if (isInBounds(nx, ny) && tempMaze[nx][ny] === Field.END) {
+			if (isInBounds(nx, ny, size) && tempMaze[nx][ny] === Field.END) {
 				return { steps: steps, path: path };
 			}
-			if (isInBounds(nx, ny) && tempMaze[nx][ny] === Field.EMPTY) {
+			if (isInBounds(nx, ny, size) && tempMaze[nx][ny] === Field.EMPTY) {
 				tempMaze[nx][ny] = Field.INQUEUE;
 				queue.push({ x: nx, y: ny, path: [...path, { x: nx, y: ny }] });
 			}
 		}
 	}
 
-	console.log("Labirynt nie ma rozwiązania.");
+	return null;
 }
 
 async function solveMazeDFS(size, maze, draw, visualisation = false) {
@@ -387,10 +388,10 @@ async function solveMazeDFS(size, maze, draw, visualisation = false) {
 			const nx = x + dx;
 			const ny = y + dy;
 
-			if (isInBounds(nx, ny) && tempMaze[nx][ny] === Field.END) {
+			if (isInBounds(nx, ny, size) && tempMaze[nx][ny] === Field.END) {
 				return { steps: steps, path: path };
 			}
-			if (isInBounds(nx, ny) && tempMaze[nx][ny] === Field.EMPTY) {
+			if (isInBounds(nx, ny, size) && tempMaze[nx][ny] === Field.EMPTY) {
 				const result = await dfs(nx, ny, [...path, { x: nx, y: ny }]);
 				if (result) return result;
 			}
@@ -460,10 +461,10 @@ async function solveMazeAStar(size, maze, draw, visualisation = false) {
 			const nx = x + dx;
 			const ny = y + dy;
 
-			if (isInBounds(nx, ny) && tempMaze[nx][ny] === Field.END) {
+			if (isInBounds(nx, ny, size) && tempMaze[nx][ny] === Field.END) {
 				return { steps: steps, path: path };
 			}
-			if (isInBounds(nx, ny) && tempMaze[nx][ny] === Field.EMPTY) {
+			if (isInBounds(nx, ny, size) && tempMaze[nx][ny] === Field.EMPTY) {
 				tempMaze[nx][ny] = Field.INQUEUE;
 				openSet.push({
 					x: nx,
@@ -476,9 +477,9 @@ async function solveMazeAStar(size, maze, draw, visualisation = false) {
 		}
 	}
 
-	console.log("Labirynt nie ma rozwiązania.");
+	return null;
 }
 
-function isInBounds(x, y) {
+function isInBounds(x, y, size) {
 	return x >= 0 && y >= 0 && x < size && y < size;
 }

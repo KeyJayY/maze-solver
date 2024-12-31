@@ -1,14 +1,20 @@
+:root {
+  --primary-color: #4caf50;
+  --primary-color-dark: #246328;
+  --secondory-color: #f4f4f9;
+}
+
 body {
 	font-family: Arial, sans-serif;
 	margin: 0;
 	padding: 0;
-	background-color: #f4f4f9;
+	background-color: var(--secondory-color);
 	color: #333;
 }
 
 header {
-	background-color: #4caf50;
-	color: white;
+	background-color: var(--primary-color);
+	color: var(--secondory-color);
 	padding: 10px 20px;
 	display: flex;
 	justify-content: space-between;
@@ -20,8 +26,8 @@ header h1 {
 }
 
 .auth-buttons button {
-	background-color: white;
-	color: #4caf50;
+	background-color: var(--secondory-color);
+	color: var(--primary-color);
 	border: none;
 	padding: 8px 12px;
 	margin-left: 10px;
@@ -31,8 +37,8 @@ header h1 {
 }
 
 .auth-buttons button:hover {
-	background-color: #45a049;
-	color: white;
+	background-color: var(--primary-color-dark);
+	color: var(--secondory-color);
 }
 
 main {
@@ -51,8 +57,8 @@ main {
 }
 
 .controls button {
-	background-color: #4caf50;
-	color: white;
+	background-color: var(--primary-color);
+	color: var(--secondory-color);
 	border: none;
 	padding: 10px 20px;
 	margin-right: 10px;
@@ -63,7 +69,7 @@ main {
 }
 
 .controls button:hover {
-	background-color: #45a049;
+	background-color: var(--primary-color-dark);
 }
 
 .maze-options {
@@ -94,8 +100,8 @@ canvas {
 }
 
 footer {
-	background-color: #4caf50;
-	color: white;
+	background-color: var(--primary-color);
+	color: var(--secondory-color);
 	text-align: center;
 	padding: 10px 0;
 	bottom: 0;
@@ -135,33 +141,55 @@ footer {
 }
 
 .window {
-	width: 400px;
-	background: white;
+	position: relative;
+	width: 70vw;
+	background: var(--secondory-color);
 	border-radius: 10px;
 	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 	overflow: hidden;
+	max-height: 80vh;
+}
+
+#info-window .window {
+	overflow-y: auto;
+}
+
+.tab h1, .tab h2 {
+	color: #2c3e50;
+}
+.tab h3 {
+	color: #34495e;
+}
+.window ul {
+	margin-left: 20px;
+}
+.algorithm {
+	margin-bottom: 20px;
 }
 
 .tabs {
+	position: -webkit-sticky;
+  	position: sticky;
+  	top: 0;
 	display: flex;
-	background-color: #0078d7;
+	background-color: var(--primary-color);
 }
 
 .tab {
 	flex: 1;
 	padding: 10px;
 	text-align: center;
-	color: white;
+	color: var(--secondory-color);
 	cursor: pointer;
 	transition: background-color 0.3s;
 }
 
 .tab:hover {
-	background-color: #005bb5;
+	background-color: var(--primary-color-dark);
 }
 
 .tab.active {
-	background-color: #005bb5;
+	background-color: var(--primary-color-dark);
 }
 
 .content {
@@ -171,4 +199,57 @@ footer {
 
 .content.active {
 	display: block;
+}
+
+#results-window .window{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+#results-window .window header{
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.negative {
+	background-color: rgb(255, 0, 0);
+}
+
+.positive {
+	background-color: rgb(0, 255, 0);
+}
+
+#results-window .window h3{
+	width: 100%;
+}
+
+
+#results-window .window button {
+	background-color: var(--primary-color);
+	color: var(--secondory-color);
+	border: none;
+	padding: 10px 20px;
+	margin-right: 10px;
+    margin-bottom: 10px;
+	cursor: pointer;
+	border-radius: 4px;
+	font-size: 16px;
+	margin: 15px 10px;
+}
+
+.form{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 10px;
+}
+
+.buttons {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
 }

@@ -1,78 +1,324 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wizualizacja Labirynt</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="algorithms.js" async></script>
-    <script src="script.js" async></script>
-</head>
-<body>
-    <div class="window-container" id="info-window">
-        <div class="window">
-            <div class="tabs">
-                <div class="tab active" onclick="changeTab(this, 'instruction')">Instrukcja</div>
-                <div class="tab" onclick="changeTab(this, 'description')">Opis Algorytmów</div>
-            </div>
-            <div class="content active" id="instruction">
-                <h2>Instrukcja</h2>
-                <p>To jest instrukcja korzystania z aplikacji.</p>
-            </div>
-            <div class="content" id="description">
-                <h2>Opis Algorytmów</h2>
-                <p>To jest opis algorytmów użytych w aplikacji.</p>
-            </div>
-        </div>
-    </div>
-    <div class="window-container" id="results-window" >
-        <div class="window">
-            <h2>Rozwiązano Labirynt</h2>
-            <p>Wynik działania algorytmu.</p>
-            <button>Pokaż ścieżkę</button>
-        </div>
-    </div>
-        <header>
-            <h1>Wizualizacja Labirynt</h1>
-        <div class="auth-buttons">
-            <button id="info" onclick="showInfoWindow()">?</button>
-            <button id="login">Login</button>
-            <button id="register">Register</button>
-        </div>
-    </header>
-    <main>
-        <div class="controls">
-            <div class="maze-options">
-                <select name="generatingAlgorithm" id="generatingAlgorithm">
-                    <option value="0">algorytm DFS</option>
-                    <option value="1">algorytm Kruskala</option>
-                    <option value="2">algorytm Prima</option>
-                    <option value="3">algorytm Binary Tree</option>
-                    <option value="4">algorytm Growing Tree</option>
-                </select>
-                <select name="solvingAlgorithm" id="solvingAlgorithm">
-                    <option value="0">algorytm BFS</option>
-                    <option value="1">algorytm DFS</option>
-                    <option value="2">algorytm A*</option>
-                </select>
-                <div class="SizeSelector">
-                    <label for="mazeSize">Maze Size:</label>
-                    <input type="number" id="mazeSize" name="mazeSize" min="10" max="100" value="30">
-                </div>
-                początek: <div id="startButton"></div>
-                koniec: <div id="endButton"></div>
-            </div>
-            <div class="maze-buttons">
-                <button id="createMaze">Wygeneruj Labirynt</button>
-                <button id="solveMaze">Rozwiąż Labirynt</button>
-                <button id="save">Zapisz obecny układ labiryntu</button>
-                <button id="load">wczytaj układ labiryntu</button>
-            </div>
-        </div>
-        <canvas id="myCanvas" width="700" height="700" style="border:1px solid #000000; background-color: #000000;"></canvas>
-    </main>
-    <footer>
-        <p>2024 Krzysztof Jabłoński Techniki Internetowe - Wizualizacja algorytmów tworzących i rozwiązujących labirynty. </p>
-    </footer>
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Wizualizacja Labirynt</title>
+		<link rel="stylesheet" href="styles.css" />
+		<script src="algorithms.js"></script>
+		<script src="script.js" async></script>
+	</head>
+	<body>
+		<div class="window-container" id="info-window">
+			<div class="window">
+				<div class="tabs">
+					<div
+						class="tab active"
+						onclick="changeTab(this, 'instruction')"
+					>
+						Instrukcja
+					</div>
+					<div class="tab" onclick="changeTab(this, 'description')">
+						Opis Algorytmów
+					</div>
+				</div>
+				<div class="content active" id="instruction">
+					<h2>Instrukcja</h2>
+					<p>To jest instrukcja korzystania z aplikacji.</p>
+				</div>
+				<div class="content" id="description">
+					<h1>Algorytmy Generowania i Rozwiązywania Labiryntów</h1>
+
+					<h2>Algorytmy Generowania Labiryntów</h2>
+
+					<div class="algorithm">
+						<h3>DFS (Depth-First Search)</h3>
+						<ul>
+							<li>
+								<strong>Opis:</strong> Algorytm DFS generuje
+								labirynt, symulując podróż w głąb wierzchołków
+								(komórek) grafu. Odwiedza każdą komórkę,
+								przechodząc w losowym kierunku, aż natrafi na
+								ścianę.
+							</li>
+							<li>
+								<strong>Cechy:</strong>
+								<ul>
+									<li>
+										Generuje labirynty z długimi, krętymi
+										ścieżkami.
+									</li>
+									<li>
+										Ściany są ułożone bardziej chaotycznie.
+									</li>
+									<li>
+										Tworzy naturalne wrażenie labiryntu.
+									</li>
+								</ul>
+							</li>
+							<li>
+								<strong>Różnice:</strong> DFS wytwarza
+								charakterystyczne ślepe zaułki i długie, ciągłe
+								korytarze.
+							</li>
+						</ul>
+					</div>
+
+					<div class="algorithm">
+						<h3>Kruskal</h3>
+						<ul>
+							<li>
+								<strong>Opis:</strong> Algorytm Kruskala
+								traktuje każdy wierzchołek jako osobny zbiór, a
+								następnie losowo łączy zbiory poprzez usuwanie
+								ścian.
+							</li>
+							<li>
+								<strong>Cechy:</strong>
+								<ul>
+									<li>
+										Labirynty mają bardziej rozłożone
+										ścieżki i równe rozłożenie przestrzeni.
+									</li>
+								</ul>
+							</li>
+							<li>
+								<strong>Różnice:</strong> Kruskal jest bardziej
+								systematyczny niż DFS, tworząc labirynty o
+								bardziej symetrycznym układzie.
+							</li>
+						</ul>
+					</div>
+
+					<div class="algorithm">
+						<h3>Prim</h3>
+						<ul>
+							<li>
+								<strong>Opis:</strong> Algorytm Prima startuje z
+								jednej komórki i rozbudowuje labirynt, dodając
+								losowe sąsiednie ściany do listy i przechodząc
+								do losowo wybranych komórek.
+							</li>
+							<li>
+								<strong>Cechy:</strong>
+								<ul>
+									<li>
+										Podobnie do DFS generuje labirynty z
+										długimi korytarzami, ale bardziej
+										równomiernie wypełnia przestrzeń.
+									</li>
+								</ul>
+							</li>
+							<li>
+								<strong>Różnice:</strong> Prim w porównaniu do
+								DFS zachowuje lepszą równowagę między ścieżkami
+								a ślepymi zaułkami.
+							</li>
+						</ul>
+					</div>
+
+					<div class="algorithm">
+						<h3>Binary Tree (Drzewo Binarne)</h3>
+						<ul>
+							<li>
+								<strong>Opis:</strong> Algorytm Binary Tree
+								startuje od wierzchołka, a następnie decyduje o
+								losowym przebiciu ściany w górę lub w lewo.
+							</li>
+							<li>
+								<strong>Cechy:</strong>
+								<ul>
+									<li>
+										Labirynty są mało losowe i mają
+										przewidywalny układ.
+									</li>
+								</ul>
+							</li>
+							<li>
+								<strong>Różnice:</strong> W porównaniu do innych
+								algorytmów Binary Tree jest prosty, ale mniej
+								interesujący wizualnie.
+							</li>
+						</ul>
+					</div>
+
+					<div class="algorithm">
+						<h3>Growing Tree (Rosnące Drzewo)</h3>
+						<ul>
+							<li>
+								<strong>Opis:</strong> Algorytm Growing Tree
+								startuje z jednej komórki i rozszerza labirynt,
+								losowo wybierając albo ostatnio dodaną komórkę,
+								albo dowolną z listy dostępnych.
+							</li>
+							<li>
+								<strong>Cechy:</strong>
+								<ul>
+									<li>
+										W zależności od parametrów może
+										przypominać zarówno DFS, jak i Prima.
+									</li>
+								</ul>
+							</li>
+							<li>
+								<strong>Różnice:</strong> Elastyczność tego
+								algorytmu pozwala tworzyć różne style
+								labiryntów.
+							</li>
+						</ul>
+					</div>
+
+                    <a href="https://en.wikipedia.org/wiki/Maze_generation_algorithm" target="_blank">Więcej informacji o algorytmach generujących labirynty</a>
+
+					<h2>Algorytmy Rozwiązywania Labiryntów</h2>
+
+					<div class="algorithm">
+						<h3>BFS (Breadth-First Search)</h3>
+						<ul>
+							<li>
+								<strong>Opis:</strong> Algorytm przeszukuje
+								labirynt poziomami, najpierw rozważając
+								wszystkie sąsiednie komórki od startu, a potem
+								przechodząc dalej.
+							</li>
+							<li>
+								<strong>Cechy:</strong>
+								<ul>
+									<li>
+										Optymalny dla znajdowania najkrótszej
+										ścieżki.
+									</li>
+									<li>
+										Rozwiązanie jest bardziej systematyczne.
+									</li>
+								</ul>
+							</li>
+							<li>
+								<strong>Różnice:</strong> BFS wymaga więcej
+								pamięci niż DFS, ale gwarantuje znalezienie
+								najkrótszej trasy.
+							</li>
+						</ul>
+					</div>
+
+					<div class="algorithm">
+						<h3>DFS (Depth-First Search)</h3>
+						<ul>
+							<li>
+								<strong>Opis:</strong> Algorytm DFS rozwiązuje
+								labirynt, eksplorując głęboko jedną ścieżkę, aż
+								trafi na koniec lub do ślepego zaułka.
+							</li>
+							<li>
+								<strong>Cechy:</strong>
+								<ul>
+									<li>Nie gwarantuje najkrótszej ścieżki.</li>
+									<li>
+										Szybszy i mniej pamięciożerny niż BFS.
+									</li>
+								</ul>
+							</li>
+							<li>
+								<strong>Różnice:</strong> DFS jest bardziej
+								chaotyczny niż BFS i może znaleźć dowolną
+								poprawną ścieżkę, a niekoniecznie optymalną.
+							</li>
+						</ul>
+					</div>
+
+					<div class="algorithm">
+						<h3>A* (A-Star)</h3>
+						<ul>
+							<li>
+								<strong>Opis:</strong> Algorytm A* używa
+								heurystyki (np. odległości Manhattan) do
+								prowadzenia eksploracji w kierunku celu.
+							</li>
+							<li>
+								<strong>Cechy:</strong>
+								<ul>
+									<li>
+										Łączy systematyczność BFS z większą
+										szybkością.
+									</li>
+									<li>
+										Wymaga dobrze zdefiniowanej heurystyki.
+									</li>
+								</ul>
+							</li>
+							<li>
+								<strong>Różnice:</strong> A* jest bardziej
+								efektywny niż BFS, szczególnie w większych
+								labiryntach.
+							</li>
+						</ul>
+					</div>
+
+                    <a href="https://en.wikipedia.org/wiki/Maze-solving_algorithm" target="_blank">Więcej informacji o algorytmach rozwiązyjących labirynty</a>
+				</div>
+			</div>
+		</div>
+		<div class="window-container" id="results-window">
+			<div class="window"></div>
+		</div>
+		<header>
+			<h1>Wizualizacja Labirynt</h1>
+			<div class="auth-buttons">
+				<button id="info" onclick="showInfoWindow()">?</button>
+				<button id="login">Login</button>
+				<button id="register">Register</button>
+			</div>
+		</header>
+		<main>
+			<div class="controls">
+				<div class="maze-options">
+					<select name="generatingAlgorithm" id="generatingAlgorithm">
+						<option value="0">algorytm DFS</option>
+						<option value="1">algorytm Kruskala</option>
+						<option value="2">algorytm Prima</option>
+						<option value="3">algorytm Binary Tree</option>
+						<option value="4">algorytm Growing Tree</option>
+					</select>
+					<select name="solvingAlgorithm" id="solvingAlgorithm">
+						<option value="0">algorytm BFS</option>
+						<option value="1">algorytm DFS</option>
+						<option value="2">algorytm A*</option>
+					</select>
+					<div class="SizeSelector">
+						<label for="mazeSize">Maze Size:</label>
+						<input
+							type="number"
+							id="mazeSize"
+							name="mazeSize"
+							min="10"
+							max="100"
+							value="30"
+						/>
+					</div>
+					początek:
+					<div id="startButton"></div>
+					koniec:
+					<div id="endButton"></div>
+				</div>
+				<div class="maze-buttons">
+					<button id="createMaze">Wygeneruj Labirynt</button>
+					<button id="solveMaze">Rozwiąż Labirynt</button>
+					<button id="save">Zapisz obecny układ labiryntu</button>
+					<button id="load">wczytaj układ labiryntu</button>
+				</div>
+			</div>
+			<canvas
+				id="myCanvas"
+				width="700"
+				height="700"
+				style="border: 1px solid #000000; background-color: #000000"
+			></canvas>
+		</main>
+		<footer>
+			<p>
+				2024 Krzysztof Jabłoński Techniki Internetowe - Wizualizacja
+				algorytmów tworzących i rozwiązujących labirynty.
+			</p>
+		</footer>
+	</body>
 </html>
