@@ -84,19 +84,74 @@ document.querySelector("#save").addEventListener("click", () => {
 	</header>
 	<div class="form">
 		<input type="text" id="name" placeholder="Nazwa" required>
+		<p style="color: red" id="message"></p>
 		<div class="buttons">
 		<button id='close'>Anuluj</button>
-		<button id='save-btn' onclick='saveMaze()'>Zapisz</button>
+		<button id='save-btn'>Zapisz</button>
+		</div>
+	</div>
+	`
+
+	window.querySelector(".window").innerHTML = text;
+	window.style.display = "flex";
+	
+	window.querySelector("#save-btn").addEventListener("click", async () => {
+		if (!document.getElementById("name").value)
+			window.querySelector("#message").innerText = "Wprowadź nazwę konfiguracji."
+		else if (await saveMaze())
+			window.style.display = "none"
+		else
+			window.querySelector("#message").innerText = "Konfiguracja o takiej nazwie już istnieje."
+	})
+	document.getElementById("close").addEventListener("click", () => {
+        window.style.display = "none";
+    });
+});
+
+document.querySelector("#load").addEventListener("click", showWindowWithConfigurations);
+
+async function showWindowWithConfigurations() {
+	const data = await loadData()
+	const window = document.querySelector("#results-window");
+	let list = '';
+	
+	data.configurations.forEach(elem => { list += `<li class="list-item"><p>${elem}</p><button class="remove" data-name="${elem}">usuń</button><button data-name="${elem}">wczytaj</button></li>` })
+
+	const text = `
+	<header>
+	<h2>Wczytaj układ labiryntu</h2>
+	</header>
+	<div class="form">
+		<ul class="list">
+		${list}
+		</ul>
+		<div class="buttons">
+		<button id='close'>Anuluj</button>
 		</div>
 	</div>
 	`
 	window.querySelector(".window").innerHTML = text;
 	window.style.display = "flex";
 
+	document.querySelector(".list").addEventListener("click", async (e) => {
+		if (e.target.tagName === "BUTTON") {
+			if (e.target.classList.contains("remove")) {
+				removeConfiguration(e.target.dataset.name)
+				showWindowWithConfigurations()
+			} else {
+				const data = await loadConfiguration(e.target.dataset.name)
+				console.log(data);
+				setMaze(data);
+				draw(maze);
+				window.style.display = "none";
+			}
+		}
+	})
+
 	document.getElementById("close").addEventListener("click", () => {
         window.style.display = "none";
     });
-});
+}
 
 document.querySelector("#info-window").addEventListener("click", (e) => {
 	if (e.target === e.currentTarget) {
@@ -109,6 +164,7 @@ document.querySelector("#results-window").addEventListener("click", (e) => {
 		document.querySelector("#results-window").style.display = "none";
 	}
 });
+
 
 function showResultWindow(algorithmNumber, results) {
 	const window = document.querySelector("#results-window");
@@ -182,7 +238,38 @@ function clearPath() {
 	drawnPath = false;
 }
 
-function saveMaze() {
+async function removeConfiguration(name) {
+	const response = await fetch(`remove_configuration.php?name=${name}`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	})	
+	return await response.json();
+}
+
+async function loadConfiguration(name) {
+	console.log(name)
+	const response = await fetch(`get_configuration.php?name=${encodeURIComponent(name)}`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	})	
+	return (await response.json()).configuration;
+}
+
+function setMaze(data) {
+	size = data.size;
+	maze = Array.from({ length: size }, () => Array(size).fill(Field.EMPTY));
+	
+	for (const wall of data.walls)
+		maze[wall.x][wall.y] = Field.WALL;
+	maze[data.start.x][data.start.y] = Field.START
+	maze[data.end.x][data.end.y] = Field.END
+}
+
+async function saveMaze() {
 	const mazeData = {};
 	mazeData.size = size;
 	mazeData.walls = [];
@@ -200,21 +287,43 @@ function saveMaze() {
 			}
 		}
 	}
-	console.log(JSON.stringify(mazeData));
-	fetch("http://localhost/~2jablonski/labs/proj/data.php", {
+	return fetch("save_data.php", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 		},
 		body: JSON.stringify(mazeData),
 	})
-		.then((data) => {
-			console.log("Success:", data);
-		})
-		.catch((error) => {
-			console.error("Error:", error);
-		});
+    .then(response => {
+        if (!response.ok) {
+			return null;
+        }
+        return response.json();
+	})
 }
+
+function loadData() {
+    return fetch("get_configurations_name.php", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        return data;
+    })
+    .catch(error => {
+        console.error('Błąd:', error);
+        return null;
+    });
+}
+
 
 function draw(maze) {
 	clearPath();
@@ -277,7 +386,6 @@ function startWorkers(maze) {
                 completed++;
 
                 if (completed === solvingAlgorithms.length) {
-                    console.log("Wyniki wszystkich workerów:", results);
                     resolve(results);
                 }
             };
